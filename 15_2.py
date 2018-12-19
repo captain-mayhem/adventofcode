@@ -138,15 +138,17 @@ class Goblin(Creature):
     self.target = Elf
     
 class Elf(Creature):
-  def __init__(self, x, y):
+  def __init__(self, x, y, strength):
     Creature.__init__(self,x ,y)
     self.target = Goblin
+    self.strength = strength
 
 class Dungeon:
-  def __init__(self, w, h):
+  def __init__(self, w, h, strength):
     self.width = w
     self.height = h
-    print('World:', w, h)
+    self.strength = strength
+    print('Strength:', strength)
     self.fields = [[None for x in range(w)] for y in range(h)]
     self.units = []
     
@@ -162,7 +164,7 @@ class Dungeon:
       self.fields[y][x] = field
     elif ch == 'E':
       field = Field()
-      field.obj = Elf(x, y)
+      field.obj = Elf(x, y, self.strength)
       self.units.append(field.obj)
       self.fields[y][x] = field
     else:
@@ -214,6 +216,13 @@ class Dungeon:
       if unit.isAlive():
         sum += unit.lives
     return sum
+    
+  def elvesDied(self):
+    for unit in self.units:
+      if isinstance(unit, Elf):
+        if not unit.isAlive():
+          return True
+    return False
       
   def __repr__(self):
     result = ''
@@ -231,22 +240,28 @@ class Dungeon:
       lineret += '\n'
       result += lineret
     return result
-    
-dungeon = Dungeon(width, height)
 
-for y in range(height):
-  for x in range(width):
-    dungeon.addTile(x, y, input[y][x])
+elvesDied = True
+strength = 3
+while elvesDied:
+  strength += 1
+  dungeon = Dungeon(width, height, strength)
 
-gameRunning = True 
-rounds = 0
-while gameRunning:   
-  gameRunning = dungeon.round()
-  if gameRunning:
-    rounds += 1
-rounds -= 1
+  for y in range(height):
+    for x in range(width):
+      dungeon.addTile(x, y, input[y][x])
 
-print(dungeon)
-livesLeft = dungeon.sumLives()
-print(rounds, livesLeft)
-print('Outcome:', rounds*livesLeft)
+  gameRunning = True 
+  rounds = 0
+  while gameRunning:   
+    gameRunning = dungeon.round()
+    if gameRunning:
+      rounds += 1
+  rounds -= 1
+
+  #print(dungeon)
+  livesLeft = dungeon.sumLives()
+  print(rounds, livesLeft)
+  print('Outcome:', rounds*livesLeft)
+  elvesDied = dungeon.elvesDied()
+
