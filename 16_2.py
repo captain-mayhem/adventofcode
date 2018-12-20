@@ -116,8 +116,10 @@ def str2i(arr):
         ret.append(int(x))
     return ret
 
+opcodes = [[x for x in range(16)] for x in range(16)]
+octable = {}
+
 i = 0
-threecount = 0
 while i < len(input):
     line = input[i]
     if line[0] != 'B':
@@ -130,7 +132,7 @@ while i < len(input):
     line = input[i+2]
     regresult = str2i(line[9:-2].split(','))
     
-    print(regs, regresult, instr)
+    #print(regs, regresult, instr)
     matching = []
     for op in range(16):
         vm.setRegisters(regs)
@@ -138,9 +140,29 @@ while i < len(input):
         if vm.compareRegisters(regresult):
             matching.append(op)
     
-    if len(matching) >= 3:
-        threecount += 1
-    i += 4
-    print(matching)
+    possible = opcodes[instr[0]]
+    newpossible = []
+    for op in matching:
+      if op in possible:
+        newpossible.append(op)
+    opcodes[instr[0]] = newpossible
 
-print(i, threecount)
+    i += 4
+    #print(matching)
+    
+for x in range(16):
+  realoc = 0
+  mapoc = 0
+  for op in range(16):
+    possibles = opcodes[op]
+    if len(possibles) == 1:
+      realoc = possibles[0]
+      mapoc = op
+      break
+  octable[possibles[0]] = op
+  for op in range(16):
+    possibles = opcodes[op]
+    if realoc in possibles:
+      possibles.remove(realoc)
+
+print(octable)
