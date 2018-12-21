@@ -159,10 +159,19 @@ for x in range(16):
       realoc = possibles[0]
       mapoc = op
       break
-  octable[possibles[0]] = op
+  octable[op] = possibles[0]
   for op in range(16):
     possibles = opcodes[op]
     if realoc in possibles:
       possibles.remove(realoc)
 
-print(octable)
+vm = VM()
+while i < len(input):
+    line = input[i]
+    if len(line) < 2:
+        i += 1 
+        continue
+    instr = str2i(line.split(' '))
+    vm.execInstr(octable[instr[0]], instr[1], instr[2], instr[3])
+    i += 1
+print(vm.regs[0])

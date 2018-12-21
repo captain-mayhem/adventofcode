@@ -42,7 +42,13 @@ maxx += 1
 width = maxx-minx
 height = maxy
 
-field = [[None for x in range(width)] for y in range(height)]
+
+class World:
+    def __init__(self, width, height):
+        print('World:', width, height)
+        self.field = [[None for x in range(width)] for y in range(height)]
+
+world = World(width, height)
 
 for line in input:
     tmp = parseLine(line)
