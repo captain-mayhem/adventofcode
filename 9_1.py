@@ -1,4 +1,4 @@
-stones = 70901
+stones = 70901*100
 players = 429
 
 circle = [0]

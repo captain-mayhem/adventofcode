@@ -169,7 +169,7 @@ class World:
       if y <= miny:
         continue
       for x in line:
-        if x == self.Water or x == self.WaterStill:
+        if x == self.WaterStill:
           water += 1
     return water
 
