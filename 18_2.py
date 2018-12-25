@@ -115,15 +115,26 @@ f = Forest(50, 50)
 
 for y in range(len(input)):
     line = input[y]
-    for x in range(len(line)):
+    for x in range(len(line)-1):
         f.addField(x, y, line[x])
 
-for x in range(10):
-  print(f)
-  f.simulate()
-print(f)
+last_tree = 0
+last_lumber = 0
+for iter in range(10):
+  for x in range(100):
+    #print(f)
+    f.simulate()
+  #print(f)
+    
+  t,l = f.countResources()
   
-t,l = f.countResources()
-print(t, l, t*l)
+  print(t, l, t*l, t-last_tree, l-last_lumber, t*l-last_tree*last_lumber)
+  last_tree = t
+  last_lumber = l
+print(f)
+
+iter = int((1000000000-1000)/700)*700
+target = 1000000000-iter
+print(target)
 
 
