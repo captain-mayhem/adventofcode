@@ -40,21 +40,21 @@ class Field:
     def __init__(self):
         self.geoidx = 0
         self.erosion = 0
-        self.distance = Inf
+        self.distance = [Inf, Inf, Inf]
         
-    def switchTool(self):
+    def getTool(self, tool):
         if self.type == Rocky:
-            if self.tool == Torch:
+            if tool == 1:
                 return Gear
             else:
                 return Torch
         if self.type == Wet:
-            if self.tool == Gear:
+            if tool == 1:
                 return Neither
             else:
                 return Gear
         if self.type == Narrow:
-            if self.tool == Torch:
+            if tool == 1:
                 return Neither
             else:
                 return Torch
@@ -111,43 +111,40 @@ class Map:
     def calcDistances(self):
         self.pos = vec2(0, 0)
         field = self.at(self.pos)
-        field.distance = 0
-        field.tool = Torch
+        field.distance[Torch] = 0
         queue = [field]
         while len(queue) > 0:
             field = queue.pop(0)
+            t1 = field.getTool(0)
+            t2 = field.getTool(1)
+            if field.distance[t1] + 7 < field.distance[t2]:
+              field.distance[t2] = field.distance[t1] + 7
+            if field.distance[t2] + 7 < field.distance[t1]:
+              field.distance[t1] = field.distance[t2] + 7
             adjFs = self.adjacentFields(field)
             for adj in adjFs:
-                dist, tool = self.calcDistance(field, adj)
-                if dist < adj.distance:
-                    adj.distance = dist
-                    adj.tool = tool
+                dist = self.calcDistance(field, adj, t1)
+                if dist < adj.distance[t1]:
+                    adj.distance[t1] = dist
                     queue.append(adj)
-            field.tool = field.switchTool()
             for adj in adjFs:
-                dist, tool = self.calcDistance(field, adj)
-                dist += 7
-                if dist < adj.distance:
-                    adj.distance = dist
-                    adj.tool = tool
+                dist = self.calcDistance(field, adj, t2)
+                if dist < adj.distance[t2]:
+                    adj.distance[t2] = dist
                     queue.append(adj)
 
-    def calcDistance(self, f1, f2):
-        dist = f1.distance+1
-        tool = f1.tool
-        if f2.type == Rocky and f1.tool == Neither:
+    def calcDistance(self, f1, f2, tool):
+        dist = f1.distance[tool]+1
+        if f2.type == Rocky and tool == Neither:
             dist = Inf
             #tool = f1.switchTool()
-        elif f2.type == Wet and f1.tool == Torch:
+        elif f2.type == Wet and tool == Torch:
             dist = Inf
             #tool = f1.switchTool()
-        elif f2.type == Narrow and f1.tool == Gear:
+        elif f2.type == Narrow and tool == Gear:
             dist = Inf
             #tool = f1.switchTool()
-        elif f2.pos == self.target and f1.tool != Torch and dist < Inf:
-            dist += 7
-            tool = Torch
-        return dist, tool
+        return dist
 
 
 depth = int(input[0][7:])
@@ -157,7 +154,7 @@ print('input',depth,tgt)
 map = Map(tgt+vec2(100,100), tgt, depth)
 map.calcDistances()
 
-print(map.at(tgt).distance)
+print(map.at(tgt).distance[Torch])
 
     
 
